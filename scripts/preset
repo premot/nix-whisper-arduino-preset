@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Manage this repository's optional local GC root and development shell.
+set -euo pipefail
+
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
+flake="path:$repo#whisper-arduino"
+root="$repo/.nix-presets/whisper-arduino"
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") {enable|shell|status|disable}
+
+  enable   Build/download the preset and keep it alive via a local GC root.
+  shell    Enter a shell with Whisper.cpp, Arduino CLI, and FFmpeg on PATH.
+  status   Report whether the local GC root exists.
+  disable  Remove the local GC root. A future Nix garbage collection may reclaim it.
+EOF
+}
+
+case "${1:-}" in
+  enable)
+    mkdir -p "$(dirname "$root")"
+    nix build "$flake" --out-link "$root"
+    printf 'Enabled local preset cache: %s\n' "$root"
+    ;;
+  shell)
+    exec nix develop "$flake"
+    ;;
+  status)
+    if [[ -L "$root" && -e "$root" ]]; then
+      printf 'enabled: %s -> %s\n' "$root" "$(readlink "$root")"
+    else
+      printf 'disabled: no local GC root at %s\n' "$root"
+    fi
+    ;;
+  disable)
+    rm -f "$root"
+    printf 'Removed local GC root. No store paths were deleted.\n'
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

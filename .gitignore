@@ -1,0 +1,6 @@
+# Local `scripts/preset enable` output: a GC-root symlink, not source.
+.nix-presets/
+
+# Nix command result links.
+result
+result-*
