@@ -1,16 +1,26 @@
-# Opt-in Whisper + Arduino Nix preset
+# Machine-local Whisper + Arduino/AVR tools
 
-This is a separate flake repository that demonstrates an optional tool preset.
-It does **not** modify NixOS configuration, Home Manager, or another repository's
-flake. The normal system closure does not refer to these packages.
+This separate flake keeps bulky, machine-specific tools out of the reusable
+NixOS and Home Manager configuration. The preset contains `whisper-mic`,
+`whisper-cli`, `arduino-cli`, `avr-gcc`, `avrdude`, GNU Make, and `picocom`.
+`whisper-mic [seconds]` records the default PipeWire microphone and transcribes
+it locally with the pinned multilingual base model.
 
-The preset contains:
+## Keep the commands available on this machine
 
-- `whisper-cpp` (including `whisper-cli`)
-- `arduino-cli`
-- `ffmpeg` (a useful audio conversion companion for Whisper workflows)
+Install the preset in the user's imperative Nix profile:
 
-Nix resolves each package's complete runtime closure when the preset is used.
+```bash
+nix profile add path:$PWD
+```
+
+The commands then remain on `PATH` and survive rebuilds without becoming part
+of any system generation or being installed when the main configuration is
+reused. Remove everything with:
+
+```bash
+nix profile remove nix-whisper-arduino-preset
+```
 
 ## Use it temporarily
 

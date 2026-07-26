@@ -11,7 +11,7 @@ usage() {
 Usage: $(basename "$0") {enable|shell|status|disable}
 
   enable   Build/download the preset and keep it alive via a local GC root.
-  shell    Enter a shell with Whisper.cpp, Arduino CLI, and FFmpeg on PATH.
+  shell    Enter a shell with microphone transcription and AVR/Arduino tools on PATH.
   status   Report whether the local GC root exists.
   disable  Remove the local GC root. A future Nix garbage collection may reclaim it.
 EOF
