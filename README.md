@@ -1,7 +1,9 @@
 # Machine-local Whisper + Arduino/AVR tools
 
-This separate flake keeps bulky, machine-specific tools out of the reusable
-NixOS and Home Manager configuration. The preset contains `whisper-mic`,
+This separate flake keeps bulky, machine-specific tools out of reusable NixOS
+and Home Manager configuration. It is consumed by the `prototype` profile in
+[`premot/v2`](https://github.com/premot/v2), while that repository's reusable
+disk profiles deliberately omit it. The preset contains `whisper-mic`,
 `whisper-cli`, `arduino-cli`, `avr-gcc`, `avrdude`, GNU Make, and `picocom`.
 `whisper-mic [seconds]` records the default PipeWire microphone and transcribes
 it locally with the pinned multilingual base model.
