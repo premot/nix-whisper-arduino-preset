@@ -5,8 +5,10 @@ and Home Manager configuration. It is consumed by the `prototype` profile in
 [`premot/v2`](https://github.com/premot/v2), while that repository's reusable
 disk profiles deliberately omit it. The preset contains `whisper-mic`,
 `whisper-cli`, `arduino-cli`, `avr-gcc`, `avrdude`, GNU Make, and `picocom`.
-`whisper-mic [seconds]` records the default PipeWire microphone and transcribes
-it locally with the pinned multilingual base model.
+`whisper-mic` records until a keypress, transcribes locally with the pinned
+multilingual base model, and copies the transcription to the Wayland clipboard.
+It prefers a connected USB microphone; otherwise it uses PipeWire's configured
+default microphone.
 
 ## Keep the commands available on this machine
 
@@ -67,6 +69,19 @@ To stop retaining it:
 This only removes the local GC root; it does not immediately delete anything
 from `/nix/store`. A later Nix garbage collection may reclaim unreferenced paths.
 
+## Transcribe from the microphone
+
+With the preset installed or its development shell open, run:
+
+```bash
+whisper-mic
+```
+
+It reports whether it found a USB microphone, starts recording, and stops on
+any keypress in the terminal. The resulting transcription is printed and copied
+to the clipboard. The command uses the local `whisper-cli` model only; it does
+not send audio or text to a remote service.
+
 ## Validate the flake
 
 ```bash
@@ -84,3 +99,4 @@ nix flake check path:$PWD
 
 Commit the updated lock file with the flake change. No update here affects the
 NixOS system flake or its lock file.
+tldr: run with ./scripts/preset shell
