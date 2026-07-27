@@ -19,7 +19,7 @@ The preset currently includes:
   `yubioath-flutter`.
 
 `whisper-mic` records until a keypress, transcribes locally with the pinned
-multilingual base model, and copies the transcription to the Wayland clipboard.
+English-only base model, and copies the transcription to the Wayland clipboard.
 It prefers a connected USB microphone; otherwise it uses PipeWire's configured
 default microphone.
 

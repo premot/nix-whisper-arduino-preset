@@ -12,8 +12,8 @@
           pkgs = import nixpkgs { inherit system; };
 
           whisperModel = pkgs.fetchurl {
-            url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin";
-            hash = "sha256-YO1bw90U7qhWST0zQ0m0BXgt3K8AKNS130CINF+6Lv4=";
+            url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin";
+            hash = "sha256-oDd5yG3zMjB19eeWyyzlAp8A7Ihp7uP9+4l6/jbG0AI=";
           };
 
           whisperMic = pkgs.writeShellApplication {
@@ -110,7 +110,7 @@
                 exit 1
               fi
 
-              transcript="$(whisper-cli --model ${whisperModel} --language auto --no-timestamps "$audio")"
+              transcript="$(whisper-cli --model ${whisperModel} --language en --no-timestamps "$audio")"
               systemd-run --user --collect --quiet wl-copy --foreground "$transcript"
               printf '%s\n' "$transcript"
               echo "Transcription copied to the clipboard." >&2
