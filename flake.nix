@@ -18,7 +18,7 @@
 
           whisperMic = pkgs.writeShellApplication {
             name = "whisper-mic";
-            runtimeInputs = [ pkgs.coreutils pkgs.jq pkgs.pipewire pkgs.whisper-cpp pkgs.wl-clipboard ];
+            runtimeInputs = [ pkgs.coreutils pkgs.jq pkgs.pipewire pkgs.systemd pkgs.whisper-cpp pkgs.wl-clipboard ];
             text = ''
               if [ "$#" -ne 0 ]; then
                 echo "Usage: whisper-mic" >&2
@@ -111,7 +111,7 @@
               fi
 
               transcript="$(whisper-cli --model ${whisperModel} --language auto --no-timestamps "$audio")"
-              printf '%s' "$transcript" | wl-copy
+              systemd-run --user --collect --quiet wl-copy --foreground "$transcript"
               printf '%s\n' "$transcript"
               echo "Transcription copied to the clipboard." >&2
             '';
