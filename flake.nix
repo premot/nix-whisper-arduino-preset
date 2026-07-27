@@ -1,5 +1,5 @@
 {
-  description = "Machine-local microphone transcription and AVR/Arduino tools";
+  description = "Machine-local optional software preset";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -118,29 +118,59 @@
           };
 
           tools = with pkgs; [
+            # Microphone transcription
             whisperMic
             whisper-cpp
+
+            # Arduino and AVR development
             arduino-cli
             avrdude
             gnumake
             picocom
             pkgsCross.avr.buildPackages.gcc
+
+            # YubiKey and related Yubico tooling
+            age-plugin-openpgp-card
+            age-plugin-yubikey
+            libykclient
+            libykneomgr
+            libyubikey
+            piv-agent
+            ryubing
+            shavee
+            yubico-pam
+            yubico-piv-tool
+            yubihsm-connector
+            yubihsm-setup
+            yubihsm-shell
+            yubikey-agent
+            yubikey-manager
+            yubikey-personalization
+            yubikey-touch-detector
+            yubioath-flutter
+            yb
           ];
 
           preset = pkgs.symlinkJoin {
-            name = "whisper-arduino-preset";
+            name = "machine-preset";
             paths = tools;
-            meta.description = "Microphone transcription and AVR/Arduino tools";
+            meta.description = "Machine-local optional software";
           };
+
+          presetShell = pkgs.mkShell { packages = tools; };
         in {
           packages = {
+            preset = preset;
+            # Compatibility alias for consumers of the old, narrowly named preset.
             whisper-arduino = preset;
             default = preset;
           };
 
           devShells = {
-            whisper-arduino = pkgs.mkShell { packages = tools; };
-            default = pkgs.mkShell { packages = tools; };
+            preset = presetShell;
+            # Compatibility alias for consumers of the old, narrowly named shell.
+            whisper-arduino = presetShell;
+            default = presetShell;
           };
         };
     in {

@@ -1,77 +1,54 @@
-Yes—**for ordinary command-line packages, it is very easy**.
+# What belongs in this preset?
 
-Current arrangement:
+`nix-whisper-arduino-preset` is now the `prototype` machine's general optional
+software preset, despite its historical repository name. The reusable
+[`premot/v2`](https://github.com/premot/v2) NixOS and Home Manager configuration
+owns the core system; this flake owns ordinary programs that are personal,
+optional, bulky, or only occasionally needed.
 
-- **`v2-main`** owns the reproducible NixOS/Home Manager core.
-- **`nix-whisper-arduino-preset`** owns this machine’s optional/bulky tools.
-- In [`v2-main/hosts/prototype/local-tools.nix`](/home/prototype/v2-main/hosts/prototype/local-tools.nix), the `prototype` configuration installs the preset as one system package.
-- The reusable `disk-*` configurations do **not** include it.
-
-So to move, for example, `picocom`, `neovim`, or `cargo` out of main:
-
-1. Remove it from [`v2-main/modules/nixos/programs/packages.nix`](/home/prototype/v2-main/modules/nixos/programs/packages.nix).
-2. Add it to the preset’s `tools` list in [`nix-whisper-arduino-preset/flake.nix`](/home/prototype/nix-whisper-arduino-preset/flake.nix):
+Add a plain package to the `tools` list in [`flake.nix`](./flake.nix). For
+example:
 
 ```nix
 tools = with pkgs; [
-  whisperMic
-  whisper-cpp
-  arduino-cli
-  avrdude
-  gnumake
-  picocom
-  pkgsCross.avr.buildPackages.gcc
-
+  # Existing tools ...
   neovim
   cargo
   rustc
 ];
 ```
 
-Whether it remains globally available depends on how you use the preset:
+The package is then available from `.#preset`, `nix develop .#preset`, and
+`./scripts/preset shell`. The historical `whisper-arduino` package and shell
+names remain compatibility aliases.
 
-- `prototype` rebuild: it stays globally on `PATH`, because `local-tools.nix` installs the preset.
-- `nix profile add path:...`: it is available only in your user Nix profile.
-- `nix develop ...`: it is available only in the development shell.
-- `disk-main`, `disk-p4`, or `disk-ata`: it is omitted entirely, preserving their reusable/minimal nature.
+## Good candidates
 
-## Important caveat: the current main flake uses the published preset
+- personal CLI programs, editors, and terminal utilities;
+- language toolchains and project-specific development tools;
+- hardware utilities such as Arduino, AVR, serial, and YubiKey tools;
+- large or occasional GUI and developer applications.
 
-[`v2-main/flake.nix`](/home/prototype/v2-main/flake.nix) currently points to:
+## Keep these in the core configuration
 
-```nix
-url = "github:premot/nix-whisper-arduino-preset/v1.0.0";
-```
+- boot, filesystem, networking, user, audio, and desktop configuration;
+- packages needed to administer or recover the base system;
+- software that needs NixOS service or module configuration rather than only an
+  executable, such as a libvirt service or `programs.nix-ld.enable`.
 
-Therefore, changing the local `/home/prototype/nix-whisper-arduino-preset` checkout **does not automatically change `v2-main`**. The normal flow is:
+Moving a plain package is a list edit. Moving a service or system behavior is
+not: retain its required NixOS configuration in the core repository.
 
-1. Edit the preset.
-2. Run `nix flake check` there.
-3. Commit/push it and publish a new tag, e.g. `v1.1.0`.
-4. Change the tag in `v2-main/flake.nix`.
-5. Update `v2-main/flake.lock`, validate, and rebuild.
+## Publishing changes for the main configuration
 
-For local experimentation, you can temporarily make the `whisper-arduino` input a local path:
+The `v2` flake consumes a versioned GitHub release of this repository, not this
+working tree. After changing the preset:
 
-```nix
-whisper-arduino.url = "path:/home/prototype/nix-whisper-arduino-preset";
-```
+1. Run `nix flake check` here.
+2. Commit, push, and publish a new tag.
+3. Update the preset input revision and lock file in `v2`.
+4. Validate and rebuild `v2`.
 
-Then `v2-main` immediately evaluates the local preset. That is convenient while developing, but should usually be changed back to a versioned GitHub tag before committing, so the configuration stays reproducible elsewhere.
-
-## What is appropriate to move?
-
-Good candidates:
-
-- personal/optional CLI tools: `btop`, `htop`, `tree`, `tldr`, `emacs`, `neovim`
-- language toolchains: `cargo`, `rustc`, `clang`, `jdk25`
-- side-project utilities: Arduino, AVR, serial, etc.
-- large occasional GUI/dev tools: perhaps `chromium`, `virt-manager`, `distrobox`
-
-Usually keep in `v2-main`:
-
-- boot, filesystem, networking, users, audio, desktop configuration
-- packages required to administer or recover the base system
-- anything whose NixOS module/configuration is needed, rather than merely its executable—e.g. `libvirt` service configuration and `programs.nix-ld.enable`
-
-In short: **moving plain package entries is a small list edit; moving services or system behavior is not.**
+For local experimentation, point the `v2` input at
+`path:/home/prototype/nix-whisper-arduino-preset`. Change it back to a versioned
+GitHub revision before committing `v2`, so other machines remain reproducible.

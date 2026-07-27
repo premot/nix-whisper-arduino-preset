@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Manage this repository's optional local GC root and development shell.
+# Manage this repository's local GC root and development shell.
 set -euo pipefail
 
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
-flake="path:$repo#whisper-arduino"
-root="$repo/.nix-presets/whisper-arduino"
+flake="path:$repo#preset"
+root="$repo/.nix-presets/preset"
 
 usage() {
   cat <<EOF
 Usage: $(basename "$0") {enable|shell|status|disable}
 
   enable   Build/download the preset and keep it alive via a local GC root.
-  shell    Enter a shell with microphone transcription and AVR/Arduino tools on PATH.
+  shell    Enter a shell with the preset tools on PATH.
   status   Report whether the local GC root exists.
   disable  Remove the local GC root. A future Nix garbage collection may reclaim it.
 EOF
