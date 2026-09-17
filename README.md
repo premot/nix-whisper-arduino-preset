@@ -23,6 +23,16 @@ English-only base model, and copies the transcription to the Wayland clipboard.
 It prefers a connected USB microphone; otherwise it uses PipeWire's configured
 default microphone.
 
+## Related local work
+
+`~/Qwen3-TTS` is a separate CPU voice-cloning/page-batch project. Its unmerged
+`~/Qwen3-TTS-detect-glitched-audio` worktree has its own Whisper-based generated
+audio checker. `~/qwen3-tts-reference-audio-research` separately evaluates voice
+references, with active distortion and concluded pathology worktrees. Those
+projects manage their own Python environments and do not depend on this preset.
+`~/qwen3-tts-bounded` is a bounded-generation POC, and `~/qwen3-tts-files` is
+the older single-file Qwen CustomVoice command.
+
 ## Keep the commands available on this machine
 
 Install the preset in the user's imperative Nix profile:
